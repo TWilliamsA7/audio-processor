@@ -6,3 +6,6 @@ obj_dir/
 
 # Slang Sever
 .slang/
+
+# Waveforms
+*.vcd
