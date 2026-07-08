@@ -1,0 +1,8 @@
+# Build Directory
+obj_dir/
+
+# VS Code Settings
+.vscode/
+
+# Slang Sever
+.slang/
