@@ -16,7 +16,9 @@ module volume_ctrl #(
     output logic valid_out
 );
 
+    localparam FRACTIONAL_BITS = 6;
     logic signed [SAMPLE_WIDTH+GAIN_WIDTH-1:0] product;
+    logic signed [SAMPLE_WIDTH+GAIN_WIDTH-1:0] rounded_product;
 
     always_ff @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
@@ -31,6 +33,9 @@ module volume_ctrl #(
         end
     end
 
-    assign audio_out = product[SAMPLE_WIDTH+GAIN_WIDTH-1:GAIN_WIDTH-1];
+    
+    assign rounded_product = product + signed'(32'd1 << (FRACTIONAL_BITS - 1));
+    // Clean, direct slice. This makes our architectural intent completely clear.
+    assign audio_out = rounded_product[SAMPLE_WIDTH+FRACTIONAL_BITS:FRACTIONAL_BITS];
     
 endmodule

@@ -1,9 +1,9 @@
 # Makefile
 VERILATOR = verilator
-VERILATOR_FLAGS = -Wall --cc --trace
+VERILATOR_FLAGS = -Wall --cc --trace -Wno-UNUSED
 
 # Explicitly list the files (top must be the primary module)
-SV_FILES = -f rtl/files.f
+SV_FILES = -f rtl/modules.f
 CPP_FILES = tb/tb.cpp
 TARGET = Vtop
 
