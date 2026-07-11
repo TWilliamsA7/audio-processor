@@ -7,13 +7,8 @@ module volume_ctrl #(
     // Gain (Q1.7 Format)
     input logic [GAIN_WIDTH-1:0] gain,
 
-    // Input Source
-    input logic [SAMPLE_WIDTH-1:0] audio_in,
-    input logic valid_in,
-
-    // Output Sink
-    output logic [SAMPLE_WIDTH:0] audio_out,
-    output logic valid_out
+    audio_stream_if.sink upstream,
+    audio_stream_if.sat_source downstream
 );
 
     localparam FRACTIONAL_BITS = 6;
@@ -23,12 +18,12 @@ module volume_ctrl #(
     always_ff @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
             product <= '0;
-            valid_out <= 1'b0;
+            downstream.valid <= 1'b0;
         end else begin
-            valid_out <= valid_in;
+            downstream.valid <= upstream.valid;
 
-            if (valid_in) begin
-                product <= 32'(signed'(audio_in)) * 32'(signed'({1'b0, gain}));
+            if (upstream.valid) begin
+                product <= 32'(signed'(upstream.data)) * 32'(signed'({1'b0, gain}));
             end
         end
     end
@@ -36,6 +31,6 @@ module volume_ctrl #(
     
     assign rounded_product = product + signed'(32'd1 << (FRACTIONAL_BITS - 1));
     // Clean, direct slice. This makes our architectural intent completely clear.
-    assign audio_out = rounded_product[SAMPLE_WIDTH+FRACTIONAL_BITS:FRACTIONAL_BITS];
+    assign downstream.sat_data = rounded_product[SAMPLE_WIDTH+FRACTIONAL_BITS:FRACTIONAL_BITS];
     
 endmodule

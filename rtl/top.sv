@@ -17,44 +17,39 @@ module top #(
     input logic bypass
 );
 
-    // Volume to Saturator
-    logic [SAMPLE_WIDTH:0] vol_to_sat_data;
-    logic vol_to_sat_valid;
+    audio_stream_if #(.WIDTH(SAMPLE_WIDTH)) stream_in();
+    audio_stream_if #(.WIDTH(SAMPLE_WIDTH)) vol_to_sat();
+    audio_stream_if #(.WIDTH(SAMPLE_WIDTH)) sat_to_mux();
+    audio_stream_if #(.WIDTH(SAMPLE_WIDTH)) stream_out();
 
-    // Saturator to Mux
-    logic [SAMPLE_WIDTH-1:0] sat_to_mux_data;
-    logic sat_to_mux_valid;
+    assign stream_in.data = audio_in;
+    assign stream_in.valid = valid_in;
 
     // Stage 1: Volume Control
     volume_ctrl #(.SAMPLE_WIDTH(SAMPLE_WIDTH)) u_volume_ctrl (
-        .clk(clk),
-        .rst_n(rst_n),
-        .gain(gain),
-        .audio_in(audio_in),
-        .valid_in(valid_in),
-        .audio_out(vol_to_sat_data),
-        .valid_out(vol_to_sat_valid)
+        .clk        (clk),
+        .rst_n      (rst_n),
+        .gain       (gain),
+        .upstream   (stream_in),
+        .downstream (vol_to_sat)
     );
 
-    // Stage 2: Saturation
     saturator #(.SAMPLE_WIDTH(SAMPLE_WIDTH)) u_saturator (
-        .clk(clk),
-        .rst_n(rst_n),
-        .audio_in(vol_to_sat_data),
-        .valid_in(vol_to_sat_valid),
-        .audio_out(sat_to_mux_data),
-        .valid_out(sat_to_mux_valid)
+        .clk        (clk),
+        .rst_n      (rst_n),
+        .upstream   (vol_to_sat),
+        .downstream (sat_to_mux)
     );
 
-    // Stage 3: Bypass
-    audio_mux #(.SAMPLE_WIDTH(SAMPLE_WIDTH)) u_audio_mux (
-        .base_audio(audio_in),
-        .base_valid_in(valid_in),
-        .altered_audio(sat_to_mux_data),
-        .altered_valid_in(sat_to_mux_valid),
-        .bypass(bypass),
-        .audio_out(audio_out),
-        .valid_out(valid_out)
+    audio_mux u_audio_mux (
+        .bypass     (bypass),
+        .raw     (stream_in),
+        .proc    (sat_to_mux),
+        .out (stream_out)
     );
+
+    // Bind the final internal interface back to the flat output ports
+    assign audio_out = stream_out.data;
+    assign valid_out = stream_out.valid;
 
 endmodule

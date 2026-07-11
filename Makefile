@@ -1,6 +1,6 @@
 # Makefile
 VERILATOR = verilator
-VERILATOR_FLAGS = -Wall --cc --trace -Wno-UNUSED
+VERILATOR_FLAGS = -Wall --cc --trace -Wno-UNUSED --top-module top
 
 # Explicitly list the files (top must be the primary module)
 SV_FILES = -f rtl/modules.f
