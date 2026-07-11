@@ -48,7 +48,6 @@ module top #(
         .out (stream_out)
     );
 
-    // Bind the final internal interface back to the flat output ports
     assign audio_out = stream_out.data;
     assign valid_out = stream_out.valid;
 

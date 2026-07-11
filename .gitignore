@@ -9,3 +9,9 @@ obj_dir/
 
 # Waveforms
 *.vcd
+
+# Outputs
+outputs/
+
+# Inputs
+inputs/

@@ -4,7 +4,7 @@ module volume_ctrl #(
 ) (
     input logic clk, rst_n,
 
-    // Gain (Q1.7 Format)
+    // Gain (Q2.6 Format)
     input logic [GAIN_WIDTH-1:0] gain,
 
     audio_stream_if.sink upstream,
