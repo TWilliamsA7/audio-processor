@@ -7,6 +7,8 @@ SV_FILES = -f rtl/modules.f
 CPP_FILES = tb/tb.cpp
 TARGET = Vtop
 
+.PHONY: all build simulate clean test
+
 all: simulate
 
 build:
@@ -17,6 +19,13 @@ build:
 simulate: build
 	@echo "Running simulation..."
 	./obj_dir/$(TARGET)
+
+	.PHONY: all build simulate clean test
+
+test:
+	@for d in tb/unit/*/; do \
+		$(MAKE) --no-print-directory -C $$d run || exit 1; \
+	done
 
 clean:
 	@echo "Cleaning build..."
