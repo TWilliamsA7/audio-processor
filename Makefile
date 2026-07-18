@@ -22,8 +22,6 @@ simulate: build
 	@echo "Running simulation..."
 	./obj_dir/$(TARGET)
 
-	.PHONY: all build simulate clean test
-
 test:
 	@if [ "$(TARGET)" = "Vtop" ]; then 
 		for d in tb/unit/*/; do  

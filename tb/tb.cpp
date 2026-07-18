@@ -49,10 +49,10 @@ int main(int argc, char** argv) {
     Verilated::traceEverOn(true);
     std::unique_ptr<VerilatedVcdC> m_trace = std::make_unique<VerilatedVcdC>();
     dut->trace(m_trace.get(), 99);
-    m_trace->open("waveform.vcd");
+    m_trace->open("outputs/waveform.vcd");
 
-    std::ifstream input_wav("input.wav", std::ios::binary);
-    std::fstream output_wav("output.wav", std::ios::out | std::ios::binary | std::ios::trunc);
+    std::ifstream input_wav("inputs/input.wav", std::ios::binary);
+    std::fstream output_wav("outputs/output.wav", std::ios::out | std::ios::binary | std::ios::trunc);
     if (!input_wav.is_open() || !output_wav.is_open()) {
         std::cerr << "CRITICAL: Could not open input.wav or output.wav!" << std::endl;
         return -1;
