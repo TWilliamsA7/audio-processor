@@ -1,6 +1,6 @@
 # Build Directory
 obj_dir/
-.obj/
+tb/unit/.obj/
 
 # VS Code Settings
 .vscode/

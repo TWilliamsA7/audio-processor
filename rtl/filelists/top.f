@@ -1,3 +1,7 @@
+// --- Package --- //
+
+-f rtl/filelists/pkg.f
+
 // --- Interfaces --- //
 
 -f rtl/filelists/interfaces.f
