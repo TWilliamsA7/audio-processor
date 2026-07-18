@@ -5,7 +5,9 @@ VERILATOR_FLAGS = -Wall --cc --trace -Wno-UNUSED --top-module top
 # Explicitly list the files (top must be the primary module)
 SV_FILES = -f rtl/modules.f
 CPP_FILES = tb/tb.cpp
-TARGET = Vtop
+TARGET ?= Vtop
+
+.ONESHELL:
 
 .PHONY: all build simulate clean test
 
@@ -23,10 +25,15 @@ simulate: build
 	.PHONY: all build simulate clean test
 
 test:
-	@for d in tb/unit/*/; do \
-		$(MAKE) --no-print-directory -C $$d run || exit 1; \
-	done
+	@if [ "$(TARGET)" = "Vtop" ]; then 
+		for d in tb/unit/*/; do  
+			$(MAKE) --no-print-directory -C $$d run || exit 1
+		done
+	else
+		$(MAKE) --no-print-directory -C "tb/unit/$(TARGET)" run || exit 1
+	fi
 
 clean:
 	@echo "Cleaning build..."
-	rm -rf obj_dir *.vcd
+	rm -rf obj_dir
+	rm -rf tb/unit/.obj
