@@ -13,5 +13,10 @@ obj_dir/
 # Outputs
 outputs/
 
+# Audio Files
+*.wav
+*.mp3
+*.m4a
+
 # Inputs
 inputs/

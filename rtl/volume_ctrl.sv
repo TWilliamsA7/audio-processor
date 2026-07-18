@@ -8,7 +8,7 @@ module volume_ctrl #(
     input logic [GAIN_WIDTH-1:0] gain,
 
     audio_stream_if.sink upstream,
-    audio_stream_if.sat_source downstream
+    wide_stream_if.source downstream
 );
 
     localparam FRACTIONAL_BITS = 6;
@@ -28,9 +28,8 @@ module volume_ctrl #(
         end
     end
 
-    
+
     assign rounded_product = product + signed'(32'd1 << (FRACTIONAL_BITS - 1));
-    // Clean, direct slice. This makes our architectural intent completely clear.
-    assign downstream.sat_data = rounded_product[SAMPLE_WIDTH+FRACTIONAL_BITS:FRACTIONAL_BITS];
-    
+    assign downstream.data = rounded_product[SAMPLE_WIDTH+FRACTIONAL_BITS:FRACTIONAL_BITS];
+
 endmodule
