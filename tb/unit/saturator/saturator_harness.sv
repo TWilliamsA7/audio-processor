@@ -5,7 +5,7 @@ module saturator_harness #(
     input  logic [SAMPLE_WIDTH:0] in_data, 
     input  logic in_valid,
     output logic [SAMPLE_WIDTH-1:0] out_data,
-    output logi out_valid
+    output logic out_valid
 );
  
     wide_stream_if  #(.WIDTH(SAMPLE_WIDTH)) upstream();

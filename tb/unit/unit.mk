@@ -1,6 +1,6 @@
 # tb/unit/unit.mk
 
-ROOT := $(realpath $(dir $(lastword $(MAKEFILE_LIST)))../../..)
+ROOT := $(realpath $(dir $(lastword $(MAKEFILE_LIST)))../..)
 
 VERILATOR = verilator
 VERILATOR_FLAGS = --cc -Wall -Wno-UNUSED $(G_PARAMS)

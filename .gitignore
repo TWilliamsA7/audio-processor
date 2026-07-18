@@ -1,5 +1,6 @@
 # Build Directory
 obj_dir/
+.obj/
 
 # VS Code Settings
 .vscode/
