@@ -3,7 +3,7 @@ VERILATOR = verilator
 VERILATOR_FLAGS = -Wall --cc --trace -Wno-UNUSED --top-module top
 
 # Explicitly list the files (top must be the primary module)
-SV_FILES = -f rtl/modules.f
+SV_FILES = -f rtl/filelists/top.f
 CPP_FILES = tb/tb.cpp
 TARGET ?= Vtop
 
