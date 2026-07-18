@@ -1,8 +1,6 @@
 // --- Interfaces --- //
 
-rtl/interfaces/audio_stream_if.sv
-
-rtl/interfaces/wide_stream_if.sv
+-f rtl/interfaces.f
 
 // --- Modules --- //
 
