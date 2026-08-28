@@ -34,7 +34,7 @@ Items below only restate DoD steps where a task needs something
 - [x] `pkg.f` filelist created and wired into `volume_ctrl.f`,
       `saturator.f`, `top.f`
 
-- [ ] **`fp_pkg` unit testbench**
+- [x] **`fp_pkg` unit testbench**
   - Requirement: cover `saturate`, `round_half_up`, `is_overflow`
     against an independent C++ golden model (re-derive the math in
     C++, don't port the SV logic).
@@ -53,7 +53,7 @@ Items below only restate DoD steps where a task needs something
     `saturate` are validated at a `narrow_width`/`frac_bits` other
     than what `volume_ctrl`/`saturator` currently use.
 
-- [ ] **Phase 1 closeout gate**
+- [x] **Phase 1 closeout gate**
   - Requirement: grep/review every module touched in Phase 1 for
     hardcoded width literals; confirm `pkg.f` ordering is correct
     everywhere it's included.
