@@ -79,7 +79,7 @@ Items below only restate DoD steps where a task needs something
   - Additional requirement: parameterizable tap count; golden model
     is a direct convolution in C++; test with an odd and even tap
     count, and a tap count of 1 (degenerate case).
-- [ ] `eq.sv` (cascaded biquad stages, if this is how EQ is
+- [x] `eq.sv` (cascaded biquad stages, if this is how EQ is
       structured) — Follow Module DoD.
   - Additional requirement: integration test instantiating multiple
     `biquad` stages; confirm latency through the cascade matches
