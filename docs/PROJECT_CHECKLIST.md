@@ -62,14 +62,14 @@ Items below only restate DoD steps where a task needs something
 
 ### Phase 2 — Filters (biquad, FIR, EQ)
 
-- [ ] **Design decision: biquad topology** (Direct Form I vs II
+- [x] **Design decision: biquad topology** (Direct Form I vs II
       Transposed) — document choice and rationale before implementing.
-- [ ] **Design decision: coefficient format** — fixed Q-format vs.
+- [x] **Design decision: coefficient format** — fixed Q-format vs.
       runtime-configurable; how coefficients enter the module
       (parameter vs. register interface — ties into Phase 6's register
       file, decide the interface shape now even if the register file
       itself doesn't exist yet).
-- [ ] `biquad.sv` — Follow Module DoD.
+- [x] `biquad.sv` — Follow Module DoD.
   - Additional requirement: golden model in C++ must implement the
     difference equation independently (not derived from the SV), and
     test at minimum: unity/passthrough coefficients, a known
