@@ -27,6 +27,13 @@ package fp_pkg;
                (guard_bits + 1) : (product_width - frac_bits);
     endfunction
 
+        function automatic int unsigned accum_width(
+        int unsigned product_width,
+        int unsigned num_terms
+    );
+        return (num_terms <= 1) ? product_width : (product_width + $clog2(num_terms));
+    endfunction
+
     // --------------------------------------------------------------- //
     // Rounding calculations                                           //
     // --------------------------------------------------------------- //

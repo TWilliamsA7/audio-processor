@@ -42,6 +42,15 @@ static uint32_t golden_shifted_result_width(uint32_t product_width,
     return (diff < floor) ? floor : diff;
 }
 
+// Mirrors fp_pkg::accum_width bit-for-bit, including the num_terms<=1 guard.
+static uint32_t golden_accum_width(uint32_t product_width, uint32_t num_terms) {
+    if (num_terms <= 1) return product_width;
+    uint32_t clog2 = 0;
+    uint32_t v = num_terms - 1;
+    while (v > 0) { clog2++; v >>= 1; }
+    return product_width + clog2;
+}
+
 static void check_i64(const char* name, int64_t got, int64_t exp) {
     if (got != exp) {
         std::printf("FAIL [%s]: expected %lld, got %lld\n", name, (long long)exp, (long long)got);
@@ -75,7 +84,8 @@ int main(int argc, char** argv) {
 
     auto apply = [&](int64_t value, uint32_t frac_bits, uint32_t narrow_width,
                       uint32_t a_width, uint32_t b_width,
-                      uint32_t product_width, uint32_t guard_bits) {
+                      uint32_t product_width, uint32_t guard_bits,
+                      uint32_t num_terms) {
         dut->value         = (uint64_t)value;
         dut->frac_bits      = frac_bits;
         dut->narrow_width   = narrow_width;
@@ -83,82 +93,109 @@ int main(int argc, char** argv) {
         dut->b_width        = b_width;
         dut->product_width  = product_width;
         dut->guard_bits     = guard_bits;
+        dut->num_terms      = num_terms;
         dut->eval();
     };
 
     // Case 1: round_half_up, normal rounding (Q2.6-style, frac_bits=6)
-    apply(100, 6, 24, 0, 0, 0, 0);
+    apply(100, 6, 24, 0, 0, 0, 0, 0);
     check_i64("round-half-up-normal", (int64_t)dut->round_half_up_out,
               golden_round_half_up(100, 6));
 
     // Case 2: round_half_up, frac_bits=0 -- early-return path, value unchanged
-    apply(-77, 0, 24, 0, 0, 0, 0);
+    apply(-77, 0, 24, 0, 0, 0, 0, 0);
     check_i64("round-half-up-zero-frac", (int64_t)dut->round_half_up_out,
               golden_round_half_up(-77, 0));
 
     // Case 3: round_half_up, negative value, frac_bits=1
-    apply(-5, 1, 24, 0, 0, 0, 0);
+    apply(-5, 1, 24, 0, 0, 0, 0, 0);
     check_i64("round-half-up-negative", (int64_t)dut->round_half_up_out,
               golden_round_half_up(-5, 1));
 
     // Case 4: saturate, exact positive boundary (24-bit) -- no clamp
-    apply(8388607, 0, 24, 0, 0, 0, 0);
+    apply(8388607, 0, 24, 0, 0, 0, 0, 0);
     check_i64("saturate-max-boundary", (int64_t)dut->saturate_out,
               golden_saturate(8388607, 24));
 
     // Case 5: saturate, one past positive boundary -- clamps
-    apply(8388608, 0, 24, 0, 0, 0, 0);
+    apply(8388608, 0, 24, 0, 0, 0, 0, 0);
     check_i64("saturate-positive-overflow", (int64_t)dut->saturate_out,
               golden_saturate(8388608, 24));
 
     // Case 6: saturate, one past negative boundary -- clamps
-    apply(-8388609, 0, 24, 0, 0, 0, 0);
+    apply(-8388609, 0, 24, 0, 0, 0, 0, 0);
     check_i64("saturate-negative-overflow", (int64_t)dut->saturate_out,
               golden_saturate(-8388609, 24));
 
     // Case 7: saturate, degenerate narrow_width=1 (range is [-1, 0])
-    apply(0, 0, 1, 0, 0, 0, 0);
+    apply(0, 0, 1, 0, 0, 0, 0, 0);
     check_i64("saturate-width1-inrange", (int64_t)dut->saturate_out,
               golden_saturate(0, 1));
 
-    apply(1, 0, 1, 0, 0, 0, 0);
+    apply(1, 0, 1, 0, 0, 0, 0, 0);
     check_i64("saturate-width1-clamps", (int64_t)dut->saturate_out,
               golden_saturate(1, 1));
 
     // Case 8: is_overflow, exactly at boundary -- false
-    apply(32767, 0, 16, 0, 0, 0, 0);
+    apply(32767, 0, 16, 0, 0, 0, 0, 0);
     check_bool("is-overflow-at-boundary-false", dut->is_overflow_out,
                golden_is_overflow(32767, 16));
 
     // Case 9: is_overflow, one past boundary -- true
-    apply(32768, 0, 16, 0, 0, 0, 0);
+    apply(32768, 0, 16, 0, 0, 0, 0, 0);
     check_bool("is-overflow-past-boundary-true", dut->is_overflow_out,
                golden_is_overflow(32768, 16));
 
     // Case 10: mult_width, typical volume_ctrl-shaped inputs (24 x 9)
-    apply(0, 0, 0, 24, 9, 0, 0);
+    apply(0, 0, 0, 24, 9, 0, 0, 0);
     check_u32("mult-width-typical", dut->mult_width_out, golden_mult_width(24, 9));
 
     // Case 11: mult_width, degenerate zero inputs
-    apply(0, 0, 0, 0, 0, 0, 0);
+    apply(0, 0, 0, 0, 0, 0, 0, 0);
     check_u32("mult-width-zero", dut->mult_width_out, golden_mult_width(0, 0));
 
     // Case 12: shifted_result_width, normal case -- diff wins over guard floor
-    apply(0, 6, 0, 0, 0, 33, 1);
+    apply(0, 6, 0, 0, 0, 33, 1, 0);
     check_u32("shifted-width-normal", dut->shifted_result_width_out,
               golden_shifted_result_width(33, 6, 1));
 
     // Case 13: shifted_result_width, guard floor wins (diff too small)
-    apply(0, 6, 0, 0, 0, 8, 4);
+    apply(0, 6, 0, 0, 0, 8, 4, 0);
     check_u32("shifted-width-guard-floor", dut->shifted_result_width_out,
               golden_shifted_result_width(8, 6, 4));
 
     // Case 14: shifted_result_width, frac_bits > product_width -- unsigned
     // wraparound path. This documents actual hardware behavior rather than
     // asserting a "sensible" result; callers must never hit this in practice.
-    apply(0, 6, 0, 0, 0, 4, 1);
+    apply(0, 6, 0, 0, 0, 4, 1, 0);
     check_u32("shifted-width-underflow-wraps", dut->shifted_result_width_out,
               golden_shifted_result_width(4, 6, 1));
+
+    // Case 15: accum_width, degenerate num_terms=0 -- guard path, same as 1
+    apply(0, 0, 0, 0, 0, 40, 0, 0);
+    check_u32("accum-width-zero-terms", dut->accum_width_out,
+              golden_accum_width(40, 0));
+
+    // Case 16: accum_width, degenerate num_terms=1 -- guard path, no growth
+    apply(0, 0, 0, 0, 0, 40, 0, 1);
+    check_u32("accum-width-one-term", dut->accum_width_out,
+              golden_accum_width(40, 1));
+
+    // Case 17: accum_width, exact power-of-2 term count (FIR's NUM_TAPS=8 shape)
+    apply(0, 0, 0, 0, 0, 40, 0, 8);
+    check_u32("accum-width-pow2-terms", dut->accum_width_out,
+              golden_accum_width(40, 8));
+
+    // Case 18: accum_width, non-power-of-2 term count -- exercises clog2
+    // rounding up rather than truncating (5 terms needs 3 growth bits, not 2)
+    apply(0, 0, 0, 0, 0, 40, 0, 5);
+    check_u32("accum-width-nonpow2-terms", dut->accum_width_out,
+              golden_accum_width(40, 5));
+
+    // Case 19: accum_width, large term count -- sanity check growth scales
+    apply(0, 0, 0, 0, 0, 40, 0, 1024);
+    check_u32("accum-width-large-terms", dut->accum_width_out,
+              golden_accum_width(40, 1024));
 
     if (errors == 0) std::printf("ALL TESTS PASSED\n");
     else              std::printf("%d TEST(S) FAILED\n", errors);
