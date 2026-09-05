@@ -89,10 +89,10 @@ Items below only restate DoD steps where a task needs something
 
 ### Phase 3 — Dynamics (compressor, gate, envelope, meter)
 
-- [ ] **Design decision: envelope follower topology** (attack/release
+- [x] **Design decision: envelope follower topology** (attack/release
       time constants, log vs. linear domain) — document before coding,
       since compressor/gate/meter all likely depend on it.
-- [ ] `envelope.sv` — Follow Module DoD.
+- [x] `envelope.sv` — Follow Module DoD.
 - [ ] `compressor.sv` — Follow Module DoD.
   - Additional requirement: golden model needs a gain-computer +
     envelope-follower reference implemented independently in C++;
