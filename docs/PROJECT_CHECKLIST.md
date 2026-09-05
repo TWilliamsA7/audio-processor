@@ -75,7 +75,7 @@ Items below only restate DoD steps where a task needs something
     test at minimum: unity/passthrough coefficients, a known
     low-pass/high-pass coefficient set, and a coefficient set that
     exercises saturation via `fp_pkg::saturate`.
-- [ ] `fir.sv` — Follow Module DoD.
+- [x] `fir.sv` — Follow Module DoD.
   - Additional requirement: parameterizable tap count; golden model
     is a direct convolution in C++; test with an odd and even tap
     count, and a tap count of 1 (degenerate case).
@@ -84,7 +84,7 @@ Items below only restate DoD steps where a task needs something
   - Additional requirement: integration test instantiating multiple
     `biquad` stages; confirm latency through the cascade matches
     `PROC_LATENCY`-style accounting used in `audio_mux`.
-- [ ] **Phase 2 closeout gate** — same shape as Phase 1's: hardcoded
+- [x] **Phase 2 closeout gate** — same shape as Phase 1's: hardcoded
       width review + Decision Log entry before Phase 3.
 
 ### Phase 3 — Dynamics (compressor, gate, envelope, meter)
