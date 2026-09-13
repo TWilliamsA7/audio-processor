@@ -98,7 +98,7 @@ Items below only restate DoD steps where a task needs something
     envelope-follower reference implemented independently in C++;
     test threshold/ratio/attack/release combinations, plus a case at
     the saturation boundary.
-- [ ] `gate.sv` — Follow Module DoD.
+- [x] `gate.sv` — Follow Module DoD.
 - [ ] `meter.sv` — Follow Module DoD.
   - Note: likely the first module without an audio-out path (metadata
     only) — confirm interface shape (new interface type, or repurpose
